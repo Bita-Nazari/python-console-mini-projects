@@ -383,28 +383,45 @@ def show_products():
     print(products)
 
 def save_product_in_file(product_dicts):
-    product_dicts = get_ready_product_dicts(product_dicts)
-
     
+    is_in_format = False
+    while not is_in_format:
+        try:
+            msg = """Are you Sure You Want To Save Changes? (1-Yes 2-No): """
+            play_warning_sound()
+            convert_text_to_audio(msg)
+            print_warning_messages(msg)
+            user_choice = int(input("> "))
 
-    if not os.path.exists(f'.\{file_name}'):
-            with open(file_name,'a') as f:
-                f.close
-                
+            is_in_format = True
+        except:
+            play_warning_sound()
+            print_error_messages('Please Enter Digit Number')
 
-        
-    with open(file_name , 'w') as file:
-        lines = []
-        for item in product_dicts:
-            line = f'{item} - {product_dicts[item]}'
-            lines.append(line)
+    if user_choice == 1:
+            product_dicts = get_ready_product_dicts(product_dicts)
             
-        file.write('\n'.join(lines))
-        play_changeSuccess_sound()
-        msg =('Your Changes Saved SuccesFully')
+            check_is_file_exist()
+            with open(file_name , 'w') as file:
+                lines = []
+                for item in product_dicts:
+                    line = f'{item} - {product_dicts[item]}'
+                    lines.append(line)
+                    
+                file.write('\n'.join(lines))
+                play_changeSuccess_sound()
+                msg =('Your Changes Saved SuccesFully')
+                
+                print_success_messages(msg)
+                convert_text_to_audio(msg)
+                
+    else:
+        return
+                
+            
+
         
-        print_success_messages(msg)
-        convert_text_to_audio(msg)
+
 
 
 def get_inventory_report():
