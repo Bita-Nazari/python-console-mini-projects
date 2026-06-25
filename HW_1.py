@@ -12,6 +12,7 @@ speaker.Rate = 1
 
 book_dicts = {} 
 product_dicts = {}
+file_name = 'Products.txt'
 
 #region setting
 
@@ -168,6 +169,11 @@ def search_book(book_dicts):
         convert_text_to_audio(msg)
        
 def show_book(book_dicts):
+    if len(book_dicts) ==0:
+        msg = 'There is No Book in The Library'
+        print_warning_messages(msg)
+        convert_text_to_audio(msg)
+        return
     books= ''
     i=0
     for item in book_dicts:
@@ -186,19 +192,19 @@ def library_managment(book_dicts):
  1-Add
  2-Search
  3-Show
- 4-Back To The Menu : """
+ 4-Back To The Menu :"""
     
 
     while True:
         
         is_check = False
-        while is_check == False:
+        while not is_check:
             
             is_in_format = False
             while not is_in_format:
                 try:
                     user_input = int(
-                    input(f'{msg} : '))
+                    input(f'{msg}'))
                     is_in_format = True
                 except:
                     play_warning_sound()
@@ -220,7 +226,13 @@ def library_managment(book_dicts):
 
 # region Inventory Functions
 
+def check_is_file_exist():
+        if not os.path.exists(f'.\{file_name}'):
+            with open(file_name,'a') as f:
+                f.close
+
 def read_product_files():
+    check_is_file_exist()
     with open('Products.txt' , 'r') as file:
         file_content = file.read()
         if len(file_content) > 0:
@@ -230,10 +242,10 @@ def read_product_files():
     
 
 def get_ready_product_dicts(product_dicts):
-    file_content = read_product_files()
-    if(len(product_dicts)  == 0 ):
-        if len(file_content) > 0:
-            for line in file_content:
+    file_line_content = read_product_files()
+    if file_line_content != None and len(product_dicts)  == 0 :
+        if len(file_line_content) > 0:
+            for line in file_line_content:
                 items = line.strip().split('-')
                 key_item = items[0].strip()
                 value_item = items[1].strip()
@@ -261,14 +273,17 @@ def is_product_by_file(product_name ):
     is_product = True
     file_line_content = read_product_files()
     file_product_names =[]
-    for line in file_line_content:
-        items = line.strip().split('-')
-        key_item = items[0].strip()
-        file_product_names.append(key_item)
+    if file_line_content != None and len(file_line_content) != 0:
+        for line in file_line_content:
+            items = line.strip().split('-')
+            key_item = items[0].strip()
+            file_product_names.append(key_item)
+        
+
         
     if not product_name in file_product_names:
         play_warning_sound()
-        msg =print(f'There is No {product_name} in Products')
+        msg =f'There is No {product_name} in Products'
         
         print_warning_messages(msg)
         convert_text_to_audio(msg)
@@ -280,12 +295,15 @@ def add_product(product_dicts):
     product_dicts = get_ready_product_dicts(product_dicts)
     product_name = input('Enter Name Of The Product : ')
 
-    try:
-        product_stock = int(input('Enter Count Of The Stock : '))
-    except:
-        play_warning_sound()
-        print_error_messages('Please Enter The Input in Digit Format')
- 
+    is_in_format = False
+    while not is_in_format:
+        try:
+            product_stock = int(input('Enter Count Of The Stock : '))
+            is_in_format = True
+        except:
+            play_warning_sound()
+            print_error_messages('Please Enter Digit Number')
+
     if product_name in product_dicts:
         old_stock = product_dicts[product_name]
         product_dicts[product_name] = int(old_stock )+ product_stock
@@ -306,7 +324,6 @@ def sell_product(product_dicts):
             is_in_format = True
         except:
             play_warning_sound()
-            is_in_format = False
             print_error_messages('Please Enter The Input in Digit Format')
         
         
@@ -333,15 +350,16 @@ def search_product():
     if is_product == False:
         return
     
-    for line in file_line_content:
-        items = line.strip().split('-')
-        if(items[0].strip() == product_name):
-            msg =(f'The Stock Of {product_name} is {items[1]}')
-            
-            print_normal_messages(msg)
-            convert_text_to_audio(msg)
-            
-            break
+    if file_line_content != None and len(file_line_content) != 0:
+        for line in file_line_content:
+            items = line.strip().split('-')
+            if(items[0].strip() == product_name):
+                msg =(f'The Stock Of {product_name} is {items[1]}')
+                
+                print_normal_messages(msg)
+                convert_text_to_audio(msg)
+                
+                break
     
 
 
@@ -350,18 +368,23 @@ def show_products():
     file_line_content = read_product_files()
     products = ''
     i=0
-    for line in file_line_content:
-        items = line.strip().split('-')
-        product_name = items[0]
-        product_stock = items[1]
-        products = products + '\n' + f'{i + 1} - Products`s Name : {product_name} - Product`s St : {product_stock}'
-        i +=1
+    if file_line_content != None and len(file_line_content) != 0:
+        for line in file_line_content:
+            items = line.strip().split('-')
+            product_name = items[0]
+            product_stock = items[1]
+            products = products + '\n' + f'{i + 1} - Products`s Name : {product_name} - Product`s St : {product_stock}'
+            i +=1
+    else:
+        msg = 'There is No Product In The Inventory'
+        print_warning_messages(msg)
+        convert_text_to_audio(msg)
 
     print(products)
 
 def save_product_in_file(product_dicts):
     product_dicts = get_ready_product_dicts(product_dicts)
-    file_name = 'Products.txt'
+
     
 
     if not os.path.exists(f'.\{file_name}'):
@@ -391,32 +414,35 @@ def get_inventory_report():
     sum_of_product_stocks =0
     products_have_stock =0
 
-
-    for line in file_line_content:
-        
-        items = line.strip().split('-')
-        if i == 0 :
-            min_products_stocks = items[0]
-            min_products_stocks_count=int(items[1]) 
+    if file_line_content != None and len(file_line_content) != 0:
+        for line in file_line_content:
             
-            max_of_products_stocks = items[0]
-            max_of_products_stocks_count =int(items[1]) 
+            items = line.strip().split('-')
+            if i == 0 :
+                min_products_stocks = items[0]
+                min_products_stocks_count=int(items[1]) 
+                
+                max_of_products_stocks = items[0]
+                max_of_products_stocks_count =int(items[1]) 
 
-
-        
-
-        if int(items[1])  > 0:
-            products_have_stock += 1
-        sum_of_product_stocks +=  int(items[1])
-        if int(items[1]) > max_of_products_stocks_count:
-            max_of_products_stocks = items[0]
-            max_of_products_stocks_count = int(items[1])
-        if int(items[1]) < min_products_stocks_count:
-            min_products_stocks = items[0]
-            min_products_stocks_count = int(items[1])
-        i +=1
+ 
+            if int(items[1])  > 0:
+                products_have_stock += 1
+            sum_of_product_stocks +=  int(items[1])
+            if int(items[1]) > max_of_products_stocks_count:
+                max_of_products_stocks = items[0]
+                max_of_products_stocks_count = int(items[1])
+            if int(items[1]) < min_products_stocks_count:
+                min_products_stocks = items[0]
+                min_products_stocks_count = int(items[1])
+            i +=1
     
-    print(f'Products Have Stock : {products_have_stock}\nSum Of Stocks : {sum_of_product_stocks}\nProduct With Max Stock : {max_of_products_stocks}\nProducts With Min Stock : {min_products_stocks}')
+        print(f'Products Have Stock : {products_have_stock}\nSum Of Stocks : {sum_of_product_stocks}\nProduct With Max Stock : {max_of_products_stocks}\nProducts With Min Stock : {min_products_stocks}')
+        
+    else:
+        msg = 'There is Nothing in Inventory'
+        print_normal_messages(msg)
+        convert_text_to_audio (msg)
 
 
 
@@ -434,11 +460,20 @@ def inventory_managment(product_dicts):
  6-Report
  7-Back To The Menu : """
  
-    warning_msg ="""as long as you don't save your changes to the file, you won't see them in the file."""
+    warning_msg =f"""as long as you don't save your changes to the file, you won't see them in the file."""
     while True:
             is_check = False
-            while is_check == False:
-                user_input = int(input(msg))
+            while not is_check:
+                is_in_format = False
+                while not is_in_format:
+                    try:
+                        user_input = int(
+                        input(f'{msg}'))
+                        is_in_format = True
+                    except:
+                        play_warning_sound()
+                        print_error_messages('Please Enter Digit Number')
+                        
                 is_check = is_input_in_range(7, user_input)
 
             if user_input == 7:
@@ -453,11 +488,13 @@ def inventory_managment(product_dicts):
             
             elif user_input ==3 :
                 print_warning_messages(warning_msg)
+                print(f'\n')
                 search_product()
                 
             
             elif user_input == 4:
                 print_warning_messages(warning_msg)
+                print(f'\n')
                 show_products()
                 
             
@@ -466,6 +503,7 @@ def inventory_managment(product_dicts):
                 
             elif user_input == 6:
                 print_warning_messages(warning_msg)
+                print(f'\n')
                 get_inventory_report()
                 
 

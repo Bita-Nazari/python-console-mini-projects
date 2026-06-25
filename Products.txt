@@ -1,5 +1,3 @@
-Butter - 10
-Tomato - 1000
-Banana - 68
-Cucumber - 53
-book - 0
+book - 10
+perfume - 5
+mug - 55
