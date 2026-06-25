@@ -1,0 +1,5 @@
+Butter - 10
+Tomato - 1000
+Banana - 68
+Cucumber - 53
+book - 0
