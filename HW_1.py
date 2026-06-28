@@ -136,8 +136,8 @@ def random_number_game():
 
 
 def add_book(book_dicts):
-    book_name = input('Enter Name Of The Book : ')
-    author_name = input('Enter Name Of The Author : ')
+    book_name = input('Enter Name Of The Book : ').lower()
+    author_name = input('Enter Name Of The Author : ').lower()
 
     if book_name in book_dicts:
         msg =f'There is Already a Book in Library Named : {book_name}'
@@ -151,7 +151,7 @@ def add_book(book_dicts):
 
 
 def search_book(book_dicts):
-    book_name = input('Enter Name Of The Book That You Want To Find : ')
+    book_name = input('Enter Name Of The Book That You Want To Find : ').lower()
     author_name = ''
 
     if book_name not in book_dicts:
@@ -255,12 +255,11 @@ def get_ready_product_dicts(product_dicts):
         
 
             
-    
 
 
 def is_product_by_dict(product_name ):
     is_product = True
-    if not product_name in product_dicts:
+    if not  product_name.lower() in product_dicts:
         play_warning_sound()
         msg =(f'There is No {product_name} in Products')
         
@@ -281,7 +280,7 @@ def is_product_by_file(product_name ):
         
 
         
-    if not product_name in file_product_names:
+    if not product_name.lower() in file_product_names:
         play_warning_sound()
         msg =f'There is No {product_name} in Products'
         
@@ -293,7 +292,7 @@ def is_product_by_file(product_name ):
 
 def add_product(product_dicts):
     product_dicts = get_ready_product_dicts(product_dicts)
-    product_name = input('Enter Name Of The Product : ')
+    product_name = input('Enter Name Of The Product : ').lower()
 
     is_in_format = False
     while not is_in_format:
@@ -315,7 +314,7 @@ def add_product(product_dicts):
 
 def sell_product(product_dicts):
     product_dicts = get_ready_product_dicts(product_dicts)
-    product_name = input('Enter Name Of The Product : ')
+    product_name = input('Enter Name Of The Product : ').lower()
     
     is_in_format = False
     while not is_in_format:
@@ -345,7 +344,7 @@ def sell_product(product_dicts):
 
 def search_product():
     file_line_content  =read_product_files()
-    product_name = input('Enter Name Of The Product You Want To Find: ')
+    product_name = input('Enter Name Of The Product You Want To Find: ').lower()
     is_product = is_product_by_file(product_name)
     if is_product == False:
         return
