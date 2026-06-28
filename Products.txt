@@ -1,3 +1,0 @@
-book - 10
-perfume - 5
-mug - 55
